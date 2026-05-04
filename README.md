@@ -3,7 +3,7 @@
 <p align="center">
     <picture>
         <source media="(prefers-color-scheme: light)" srcset="logo.svg">
-        <img src="/home/mgmt/euroopencost-lab/logos/logo.svg" alt="EuroOpenCost" width="500">
+        <img src="logos/logo.svg" alt="EuroOpenCost" width="500">
     </picture>
 </p>
 
@@ -55,7 +55,7 @@ True sovereignty is built on a foundation of physical control and logical isolat
 
 
 <p align="center">
-  <img src="/home/mgmt/euroopencost-lab/logos/infrastructure.png" alt="EuroOpenCost Architecture Diagram" width="900" style="border-radius: 10px; border: 1px solid #333;">
+  <img src="logos/infrastructure.png" alt="EuroOpenCost Architecture Diagram" width="900" style="border-radius: 10px; border: 1px solid #333;">
 </p>
 
 Made with love.
