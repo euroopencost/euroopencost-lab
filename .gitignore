@@ -1,0 +1,48 @@
+# ==========================================
+# EuroOpenCost-Lab: Ultimate .gitignore
+# ==========================================
+
+# --- Terraform & OpenTofu ---
+# Wir ignorieren das Arbeitsverzeichnis und alle State-Dateien
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfplan
+*.tfvars.json
+
+# WICHTIG: terraform.tfvars NICHT ignorieren (da deine Dummy-Werte dort stehen)
+# !terraform.tfvars <--- (Optional, falls du es explizit erzwingen willst)
+
+# --- Secrets & Configs ---
+# Die echten Geheimnisse in der globals.yaml dürfen niemals hochgeladen werden!
+globals.yaml
+.env
+*.pem
+*.key
+ssh_config
+
+# --- System & OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.log
+
+# --- VS Code & IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Ansible ---
+*.retry
+inventory.ini
+
+# --- Python (falls Scripte vorhanden) ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/

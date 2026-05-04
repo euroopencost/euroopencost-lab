@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitea-runner
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitea-runner-token
+  namespace: gitea-runner
+type: Opaque
+stringData:
+  GITEA_RUNNER_TOKEN: "${GITEA_TOKEN}"
+  GITEA_INSTANCE_URL: "http://gitea-service.gitea.svc.cluster.local:3000"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea-actions-runner
+  namespace: gitea-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea-actions-runner
+  template:
+    metadata:
+      labels:
+        app: gitea-actions-runner
+    spec:
+      containers:
+        - name: runner
+          image: ghcr.io/christopherhx/gitea-actions-runner:latest
+          env:
+            - name: GITEA_INSTANCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-runner-token
+                  key: GITEA_INSTANCE_URL
+            - name: GITEA_RUNNER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-runner-token
+                  key: GITEA_RUNNER_TOKEN
+          command: ["/bin/sh", "-c", "gitea-actions-runner daemon"]
