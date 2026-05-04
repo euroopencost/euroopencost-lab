@@ -1,0 +1,17 @@
+# EuroOpenCost-Lab: Only for showing potential values for the globals.yaml. DO NO COMMIT globals.yaml
+global:
+  domain: "test@test.dev"
+  email: "admin@test.dev"
+  
+network:
+  gateway: "192.168.10.1"
+  master_ip: "192.168.10.10/24"
+  metallb_range: "192.168.10.50-192.168.10.60"
+  traefik_lb_ip: "192.168.10.50"
+
+proxmox:
+  node: "homelab"
+  bridge: "vnet1"
+
+secrets:
+  cloudflare_token: "insert-your-cloudflare-or-read-the-docs"

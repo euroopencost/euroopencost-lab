@@ -25,7 +25,7 @@ Stop wasting your hardware's potential. We leverage Proxmox, K3s, and GitOps to 
 
 
 
-[Website](https://salad1n.dev) · [Infrastructure](#-1-infrastructure-blueprint--technical-architecture) · [Manual Steps](#-2-pre-flight-checklist-manual-steps) · [Networking](#3-networking-route-vlan-40) · [Vision](#4--The-Vision-of-EuroOpenCost-Lab) · [Sponsors](#5-sponsors--partners)
+[Website](https://salad1n.dev) · [Infrastructure](#-1-infrastructure-blueprint--technical-architecture) · [Quick Start](#-2-quick-start) · [Networking](#24-networking-route-vlan-40) · [Vision](#3--the-vision-of-euroopencost-lab) · [Sponsors](#4-sponsors--partners)
 
 ---
 
@@ -86,7 +86,7 @@ Made with love.
 * **GitOps Core:** [ArgoCD](https://argoproj.github.io/cd/) — The single source of truth. Your cluster maintains its state automatically based on your Git repository.
 
 
-## 🛠 2. Step by Step Deployment Guide
+## 🛠 2. Quick Start
 
 *Before firing up the automated deployment scripts, you need to manually bridge the gap between your hardware and the outside world.*
 
@@ -101,6 +101,7 @@ Made with love.
    ```bash
    git clone https://github.com/euroopencost/euroopencost-lab.git
    cd euroopencost-lab
+    ```
 
 ### 2.1.1 Cloudflare API Token
 * You require a token with **Zone:DNS:Edit** and **Zone:Zone:Read** permissions.
@@ -144,9 +145,7 @@ This stage handles the automated creation of your Virtual Machines on Proxmox.
 Ensure your Proxmox node has enough resources (CPU/RAM) available as defined in your `hardware_specs` within the Terraform files to avoid provisioning errors.
 
 
-## 3. Networking Route (VLAN 40)
-Sollte dein Management-Host in einem anderen Netz (z.B. Home-Office LAN `192.168.2.0/24`) hängen, setze die Route zum Proxmox-SDN:
-
+### 2.4 Networking Route (VLAN 40)
 
 If your MGMT host resides in a different network (e.g., standard LAN IP-ADRESS/24), add a route to the Proxmox SDN:
 
@@ -162,7 +161,7 @@ Run the sync script to generate a fresh globals.yaml based on your terraform.tfv
 
 #### Sync Terraform outputs to globals.yaml
 ````bash
-bash sync-globals.sh
+bash scripts/sync-configs.sh
 ````
 
 #### IMPORTANT: Manually add your sensitive tokens (e.g., Cloudflare)
@@ -174,11 +173,11 @@ The sync script automatically extracts your domain, IP addresses, and node names
 
 #### Ignite the Lab
 ````shell
-bash deploy-lab.sh
+bash scripts/deploy-lab.sh
 ````
 
 
-## 4. 🎯 The Vision of EuroOpenCost Lab
+## 3. 🎯 The Vision of EuroOpenCost Lab
 
 The EuroOpenCost-Lab was born from the need to merge agility with total resource control.
 
@@ -191,4 +190,4 @@ The EuroOpenCost-Lab was born from the need to merge agility with total resource
 **Empowered Ownership**: In a world of rented subscriptions, owning your infrastructure is the ultimate act of technical freedom.
 
 
-## 5.🤝 Sponsors & Partners
+## 4.🤝 Sponsors & Partners
