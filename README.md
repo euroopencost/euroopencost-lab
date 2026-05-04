@@ -86,35 +86,63 @@ Made with love.
 * **GitOps Core:** [ArgoCD](https://argoproj.github.io/cd/) — The single source of truth. Your cluster maintains its state automatically based on your Git repository.
 
 
-## 🛠 2. Pre-Flight Checklist (Manual Steps)
-
+## 🛠 2. Step by Step Deployment Guide
 
 *Before firing up the automated deployment scripts, you need to manually bridge the gap between your hardware and the outside world.*
 
-1. **Cloudflare API Token**
+---
+### 2.1 Proxmox Setup
+1. **Create User:** Create a user named `terraform-prov@pve` in your Proxmox web interface.
+2. **Permissions:** Assign the `PVEVMAdmin` and `PVEDatastoreAdmin` roles to this user.
+3. **API Token:** Generate an API Token for this user. **Save the Secret Key!** You will need it for your Terraform variables.
 
-    - You require a token with **Zone:DNS:Edit** and **Zone:Zone:Read** permissions.
-    - Create the token in your Cloudflare Dashboard.
+### 2.1 Infrastructure Provisioning
+1. **Clone the Repo:**
+   ```bash
+   git clone https://github.com/euroopencost/euroopencost-lab.git
+   cd euroopencost-lab
 
-Insert it into your globals.yaml.
+### 2.1.1 Cloudflare API Token
+* You require a token with **Zone:DNS:Edit** and **Zone:Zone:Read** permissions.
+* Create the token in your Cloudflare Dashboard.
+* You will insert this into your `globals.yaml` later in the guide.
 
-2. **K3s Kubeconfig Export**
+### 2.2 K3s Kubeconfig Export
+To control your cluster from your management machine, you must migrate the config from the Master node after deployment:
+1. **SSH to Master:** `ssh ubuntu@your-k8s-master-ip`
+2. **Read Config:** `sudo cat /etc/rancher/k3s/k3s.yaml`
+3. **Save Locally:** Copy the content to your MGMT host at `~/.kube/config`.
+4. **Update IP:** Replace `server: https://127.0.0.1:6443` with `server: https://your-k8s-master-ip:6443`.
 
-To control your cluster from your management machine, you must migrate the config from the Master node:
+
+### 2.3 Infrastructure Provisioning (Terraform)
+
+This stage handles the automated creation of your Virtual Machines on Proxmox.
+
+1.  **Configure Variables:**
+    Navigate to the `terraform/` directory and locate the `terraform.tfvars` file. Even though it contains dummy values for the repository, you must update it with your specific environment data:
+    *   `proxmox_api_url`: Your Proxmox endpoint (e.g., `https://192.168.1.10:8006/api2/json`).
+    *   `proxmox_api_token_id`: The ID of the token created in the Proxmox Setup step.
+    *   `proxmox_api_token_secret`: The secret key for your automation user.
+    *   `network_config`: Define your IP addresses and gateways for VLAN 20 and 40.
+
+2.  **Initialize and Deploy:**
+    Run the following commands to initialize the providers and roll out the infrastructure:
+    ```bash
+    cd terraform
+    terraform init
+    terraform plan   # Review the changes before applying
+    terraform apply -auto-approve
+    ```
+
+3.  **Capture SSH Output:**
+    Once the deployment is successful, Terraform will display a custom output named `master_ssh_command`. 
+    *   **Action:** Copy this command immediately.
+    *   **Purpose:** Use it to verify that your Master Node is reachable before proceeding to the Helm/K3s deployment.
 
 
-````bash
-# SSH to Master: 
-ssh ubuntu@your-ip
-# Read Config: 
-sudo cat /etc/rancher/k3s/k3s.yaml
-````
+Ensure your Proxmox node has enough resources (CPU/RAM) available as defined in your `hardware_specs` within the Terraform files to avoid provisioning errors.
 
-**Save Locally:** 
-Copy the content to your MGMT host at ~/.kube/config.
-
-**Update IP:**
-Replace server: https://127.0.0.1:6443 with server: https://your-k8s-master-ip:6443.
 
 ## 3. Networking Route (VLAN 40)
 Sollte dein Management-Host in einem anderen Netz (z.B. Home-Office LAN `192.168.2.0/24`) hängen, setze die Route zum Proxmox-SDN:
@@ -125,25 +153,6 @@ If your MGMT host resides in a different network (e.g., standard LAN IP-ADRESS/2
 ````bash
 sudo ip route add IP-ADRESS/24 via <YOUR_PROXMOX_NODE_IP>
 ````
-
-Prerequisite: A running Proxmox node with pre-configured SDN/VLANs (20/40).
-
-
-
-````bash
-# 1. Clone the Empire
-git clone https://github.com/euroopencost/euroopencost-lab.git
-
-cd euroopencost-lab
-
-# 2. Configure your secret sauce
-cp globals.example.yaml globals.yaml
-nano globals.yaml # Inject Cloudflare Token, Domain & Proxmox IPs
-
-# 3. Ignite the Lab
-bash deploy-lab.sh
-````
-
 
 #### Configure your secret sauce
 
